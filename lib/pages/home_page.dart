@@ -4,6 +4,7 @@ import 'package:rockedex/providers/pokemons_provider.dart';
 import 'package:rockedex/models/pokemon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rockedex/providers/styles_provider.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late PokemonsProvider pokemonsProvider;
+  late UserProvider usersProvider;
   late StylesProvider stylesProvider;
   TextEditingController controladorBusqueda = TextEditingController();
 
@@ -23,6 +25,13 @@ class _HomePageState extends State<HomePage> {
       context,
       listen: true,
     );
+
+    usersProvider = Provider.of<UserProvider>(
+      context,
+      listen: true,
+    );
+
+    pokemonsProvider.obtenerFavoritos(usersProvider.currentUser.name);
 
     stylesProvider = Provider.of<StylesProvider>(
       context,
@@ -325,7 +334,10 @@ class _HomePageState extends State<HomePage> {
                 ? Colors.red
                 : Colors.black,
             onPressed: () {
-              pokemonsProvider.toggleFavorito(pokemon);
+              pokemonsProvider.toggleFavorito(
+                usersProvider.currentUser.name,
+                pokemon,
+              );
             },
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:rockedex/providers/pokemons_provider.dart';
 import 'package:rockedex/models/pokemon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rockedex/providers/styles_provider.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 class FavsPage extends StatefulWidget {
   const FavsPage({super.key});
@@ -14,6 +15,7 @@ class FavsPage extends StatefulWidget {
 
 class _FavsPageState extends State<FavsPage> {
   late PokemonsProvider pokemonsProvider;
+  late UserProvider userProvider;
   late StylesProvider stylesProvider;
 
   @override
@@ -22,6 +24,13 @@ class _FavsPageState extends State<FavsPage> {
       context,
       listen: true,
     );
+
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: true,
+    );
+
+    pokemonsProvider.obtenerFavoritos(userProvider.currentUser.name);
 
     stylesProvider = Provider.of<StylesProvider>(
       context,
@@ -232,7 +241,10 @@ class _FavsPageState extends State<FavsPage> {
                 ? Colors.red
                 : Colors.black,
             onPressed: () {
-              pokemonsProvider.toggleFavorito(pokemon);
+              pokemonsProvider.toggleFavorito(
+                userProvider.currentUser.name,
+                pokemon,
+              );
             },
           ),
         ),

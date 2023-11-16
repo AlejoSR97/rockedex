@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rockedex/models/pokemon.dart';
 import 'package:rockedex/providers/pokemons_provider.dart';
 import 'package:rockedex/providers/styles_provider.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 class PokemonPage extends StatefulWidget {
   const PokemonPage({super.key});
@@ -14,10 +15,16 @@ class PokemonPage extends StatefulWidget {
 
 class _PokemonPageState extends State<PokemonPage> {
   late PokemonsProvider pokemonsProvider;
+  late UserProvider userProvider;
   late StylesProvider stylesProvider;
   @override
   Widget build(BuildContext context) {
     pokemonsProvider = Provider.of<PokemonsProvider>(
+      context,
+      listen: true,
+    );
+
+    userProvider = Provider.of<UserProvider>(
       context,
       listen: true,
     );
@@ -230,7 +237,10 @@ class _PokemonPageState extends State<PokemonPage> {
       ),
       child: TextButton(
         onPressed: () {
-          pokemonsProvider.toggleFavorito(pokemon);
+          pokemonsProvider.toggleFavorito(
+            userProvider.currentUser.name,
+            pokemon,
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(15),

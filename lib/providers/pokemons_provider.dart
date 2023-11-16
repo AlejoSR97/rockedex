@@ -63,7 +63,8 @@ class PokemonsProvider extends ChangeNotifier {
           }
 
           listaPokemones.add(newPokemon);
-          listaPokemones.sort((a, b) => int.parse(a.number!) > int.parse(b.number!) ? 1 : 0);
+          listaPokemones.sort(
+              (a, b) => int.parse(a.number!) > int.parse(b.number!) ? 1 : 0);
           notifyListeners();
         }
       }
@@ -91,23 +92,71 @@ class PokemonsProvider extends ChangeNotifier {
     getPokemonsList();
   }
 
-  agregarFavorito(Pokemon pokemon) {
-    pokemonesFavoritos.add(pokemon);
+  obtenerFavoritos(String username) async {
+    List<Pokemon> listaFavoritos = [];
+
+    await http.get(
+      Uri.parse('http://192.168.1.6:4000/api/pokemones/favorites'),
+      headers: {
+        'user': username,
+      },
+    ).then((response) {
+      if (response.statusCode == 200) {
+        for (var favorito in json.decode(response.body)) {
+          Pokemon pokemon = Pokemon(
+            number: favorito['number'],
+            name: favorito['name'],
+            description: favorito['description'],
+            image: favorito['image'],
+            url: favorito['url'],
+            height: favorito['height'],
+            weight: favorito['weight'],
+            types: [],
+          );
+          for (var tipo in favorito['types']) {
+            pokemon.types.add(tipo.toString());
+          }
+          listaFavoritos.add(pokemon);
+        }
+      } else {
+        listaFavoritos = [];
+      }
+    });
+
+    pokemonesFavoritos = listaFavoritos;
     notifyListeners();
   }
 
-  eliminarFavorito(Pokemon pokemon) {
-    pokemonesFavoritos.removeWhere((e) => e.number == pokemon.number);
-    notifyListeners();
+  agregarFavorito(String username, Pokemon pokemon) async {
+    await http.post(
+      Uri.parse('http://192.168.1.6:4000/api/pokemones/favorites'),
+      headers: {
+        "content-type": "application/json",
+        "user": username,
+      },
+      body: json.encode(pokemon.toJson()),
+    );
   }
 
-  toggleFavorito(Pokemon pokemon) {
+  eliminarFavorito(String username, Pokemon pokemon) async {
+    await http.delete(
+      Uri.parse('http://192.168.1.6:4000/api/pokemones/favorites'),
+      headers: {
+        "content-type": "application/json",
+        "user": username,
+        "pokemon": pokemon.number.toString(),
+      },
+    );
+  }
+
+  toggleFavorito(String username, Pokemon pokemon) {
     if (esFavorito(pokemon.number)) {
-      eliminarFavorito(pokemon);
+      eliminarFavorito(username, pokemon);
     } else {
-      agregarFavorito(pokemon);
+      agregarFavorito(username, pokemon);
     }
-    pokemonesFavoritos.sort((a, b) => int.parse(a.number!) > int.parse(b.number!) ? 1 : 0);
+    pokemonesFavoritos
+        .sort((a, b) => int.parse(a.number!) > int.parse(b.number!) ? 1 : 0);
   }
 
   esFavorito(String? number) {
