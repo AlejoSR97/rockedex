@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:rockedex/models/user.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -9,9 +12,21 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  late UserProvider userProvider;
   int seleccionado = 0;
+  List<String> equipos = ['rojo', 'azul', 'amarillo'];
+
+  TextEditingController userController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController nicknameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: true,
+    );
+
     return Scaffold(
       body: body(context),
     );
@@ -92,6 +107,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget campoUsuario() {
     return TextFormField(
+      controller: userController,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -125,6 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget campoContrasena() {
     return TextFormField(
+      controller: passwordController,
       obscureText: true,
       decoration: InputDecoration(
         border: OutlineInputBorder(
@@ -159,6 +176,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget campoNickname() {
     return TextFormField(
+      controller: nicknameController,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -290,7 +308,23 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         ),
         onPressed: () {
-          Navigator.pushReplacementNamed(context, 'home');
+          if (userController.text.isNotEmpty &&
+              passwordController.text.isNotEmpty &&
+              nicknameController.text.isNotEmpty &&
+              seleccionado > 0) {
+            User user = User(
+              name: userController.text,
+              password: passwordController.text,
+              nickname: nicknameController.text,
+              team: equipos[seleccionado - 1],
+            );
+
+            userProvider.register(user).then((value) {
+              if (value) {
+                Navigator.pushReplacementNamed(context, 'home');
+              }
+            });
+          }
         },
       ),
     );

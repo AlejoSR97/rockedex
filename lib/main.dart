@@ -7,6 +7,7 @@ import 'package:rockedex/pages/pokemon_page.dart';
 import 'package:rockedex/pages/signup_page.dart';
 import 'package:rockedex/providers/pokemons_provider.dart';
 import 'package:rockedex/providers/styles_provider.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 void main() => runApp(const AppState());
 
@@ -23,6 +24,10 @@ class AppState extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => StylesProvider(),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(),
           lazy: false,
         ),
       ],

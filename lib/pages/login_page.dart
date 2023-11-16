@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:rockedex/providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,8 +11,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController userController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  late UserProvider userProvider;
+
   @override
   Widget build(BuildContext context) {
+    userProvider = Provider.of<UserProvider>(
+      context,
+      listen: true,
+    );
+
     return Scaffold(
       body: body(context),
     );
@@ -87,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget campoUsuario() {
     return TextFormField(
+      controller: userController,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -121,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget campoContrasena() {
     return TextFormField(
       obscureText: true,
+      controller: passwordController,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -170,8 +183,20 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
         ),
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, 'home');
+        onPressed: () async {
+          if (userController.text.isNotEmpty &&
+              passwordController.text.isNotEmpty) {
+            userProvider
+                .authUser(
+              userController.text,
+              passwordController.text,
+            )
+                .then((value) {
+              if (value) {
+                Navigator.pushReplacementNamed(context, 'home');
+              }
+            });
+          }
         },
       ),
     );
