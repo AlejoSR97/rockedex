@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rockedex/widgets/toast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:rockedex/providers/user_provider.dart';
@@ -17,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
+
     userProvider = Provider.of<UserProvider>(
       context,
       listen: true,
@@ -193,9 +196,22 @@ class _LoginPageState extends State<LoginPage> {
             )
                 .then((value) {
               if (value) {
+                Toast.show(
+                  'Bienvenido de nuevo!',
+                  type: Toast.success,
+                  duration: 2,
+                  gravity: Toast.bottom,
+                );
                 Navigator.pushReplacementNamed(context, 'home');
               }
             });
+          } else {
+            Toast.show(
+              'Por favor rellena todos los campos',
+              type: Toast.error,
+              duration: 2,
+              gravity: Toast.bottom,
+            );
           }
         },
       ),
